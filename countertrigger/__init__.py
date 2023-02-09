@@ -1,3 +1,4 @@
+#I need to figure out how Azure functions work
 import logging
 
 import azure.functions as func
