@@ -5,8 +5,11 @@ from azure.data.tables import TableServiceClient, TableClient, TableEntity, Upda
 
 connection_string = os.environ['AzureTableEndpoint']
 
+def func_update_counter(num: int):
+    return num+1
+
 def main(req: func.HttpRequest, messageJSON) -> func.HttpResponse:
-    updated_counter = (int((json.loads(messageJSON))[0]['number']))+1
+    updated_counter = func_update_counter(int((json.loads(messageJSON))[0]['number']))
     updated_entity = {
         'PartitionKey':'counter',
         'RowKey':'visitor',
