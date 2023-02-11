@@ -1,25 +1,20 @@
-#I need to figure out how Azure functions work
-import logging
-
+import json
+import os
 import azure.functions as func
+from azure.data.tables import TableServiceClient, TableClient, TableEntity, UpdateMode
 
+connection_string = os.environ['AzureTableEndpoint']
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+def main(req: func.HttpRequest, messageJSON) -> func.HttpResponse:
+    updated_counter = (int((json.loads(messageJSON))[0]['number']))+1
+    updated_entity = {
+        'PartitionKey':'counter',
+        'RowKey':'visitor',
+        'number': updated_counter
+    }
 
-    name = req.params.get('name')
-    if not name:
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
-        else:
-            name = req_body.get('name')
+    service = TableServiceClient.from_connection_string(conn_str=connection_string)
+    counter_table = service.get_table_client('counter')
+    counter_table.update_entity(mode=UpdateMode.REPLACE, entity=updated_entity)
 
-    if name:
-        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
-    else:
-        return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
-        )
+    return func.HttpResponse(f"{updated_counter}")
