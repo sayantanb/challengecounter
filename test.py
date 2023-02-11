@@ -1,5 +1,5 @@
 import unittest
-from countertrigger.__init__ import func_update_counter
+from countertrigger import func_update_counter
 
 class TestFile(unittest.TestCase):
     def testAdddition(self):
